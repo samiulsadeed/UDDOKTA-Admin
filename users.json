@@ -1,0 +1,16 @@
+{
+  "sadeed": {
+    "username": "sadeed",
+    "role": "Managing Director",
+    "salt": "e673fb4f0179244f18ff9ceaccd7fdf0",
+    "hash": "3f04347402f8e4ca10f8f06ceac5ac3af1910eb87ebf2b570fd4583e9fc630f661e3a177ac8fd6edb7243b739336d3aab7be17273b9c8a929c68a6dd87f9c7ae",
+    "created": "2026-09-30T04:49:38.200Z"
+  },
+  "faysal": {
+    "username": "faysal",
+    "role": "Chairman",
+    "salt": "c8ea8290b00735bd66d0ec9275bbab12",
+    "hash": "46d73c369da8f65e3e7b057fc14d6aa7b80922f0762a04998e0cc7df4d790cc3bb673f55103ff7c0b3fa92d2535a452e4000ce1b093db43db8332a77c223db0c",
+    "created": "2026-09-30T04:50:34.220Z"
+  }
+}

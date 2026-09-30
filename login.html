@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Log in · Uddokta 360</title>
+<link rel="manifest" href="/manifest.webmanifest"><meta name="theme-color" content="#3b4cf0">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f2f4f8;--panel:#fff;--ink:#141a2b;--mut:#6b7488;--line:#e3e7ef;--acc:#3b4cf0;--acc2:#ff6b4a;--err:#d6361f;--sh:0 1px 2px rgba(20,26,43,.06),0 8px 24px -12px rgba(20,26,43,.12);box-sizing:border-box}
+@media(prefers-color-scheme:dark){:root{--bg:#0c0f1a;--panel:#141828;--ink:#eef0f8;--mut:#8b93a9;--line:#232941;--acc:#7b88ff;--err:#ff7b66;--sh:none}}
+*{box-sizing:border-box}html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 'Instrument Sans',system-ui,sans-serif;display:grid;place-items:center;padding:20px;padding-top:max(20px,env(safe-area-inset-top));padding-bottom:max(20px,env(safe-area-inset-bottom))}
+.box{width:min(400px,100%);background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:28px;box-shadow:var(--sh)}
+.brand{font:700 22px 'Bricolage Grotesque',Georgia,sans-serif;letter-spacing:-.02em;display:flex;gap:10px;align-items:center}
+.logo{width:30px;height:30px;border-radius:9px;background:conic-gradient(from 200deg,var(--acc),var(--acc2),var(--acc));display:grid;place-items:center;color:#fff;font-size:15px}
+h1{font:700 20px 'Bricolage Grotesque',Georgia,sans-serif;letter-spacing:-.02em;margin:22px 0 2px}
+.sub{color:var(--mut);margin:0 0 16px}
+label{display:block;color:var(--mut);font-size:13px;margin-top:12px}
+input,select{width:100%;font:inherit;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:9px;padding:10px;margin-top:4px}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.show{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:13px;color:var(--mut)}.show input{width:auto;margin:0}
+button.p{width:100%;margin-top:18px;font:inherit;font-weight:600;background:var(--acc);color:#fff;border:0;border-radius:10px;padding:11px;cursor:pointer}
+button.p:disabled{opacity:.6;cursor:default}
+button.l{background:none;border:0;color:var(--acc);font:inherit;cursor:pointer;padding:0}
+.sw{text-align:center;margin-top:16px;color:var(--mut)}
+#err{color:var(--err);min-height:20px;margin:12px 0 0;font-size:13px}
+[hidden]{display:none!important}
+</style></head><body>
+<main class="box">
+  <div class="brand"><span class="logo">U</span>Uddokta 360</div>
+  <h1 id="ttl">Log in</h1>
+  <p class="sub" id="sub">Enter your username, category and password.</p>
+  <form id="f" autocomplete="on">
+    <label>Username<input id="u" name="username" autocomplete="username" required autofocus></label>
+    <label>Category<select id="r" name="role"></select></label>
+    <label>Password<input id="p" name="password" type="password" autocomplete="current-password" required></label>
+    <label id="cw" hidden>Confirm password<input id="c" type="password" autocomplete="new-password"></label>
+    <label class="show"><input type="checkbox" id="sh"> Show password</label>
+    <p id="err" role="alert"></p>
+    <button class="p" id="go" type="submit">Log in</button>
+  </form>
+  <p class="sw"><span id="q">First time here?</span> <button class="l" id="tg" type="button">Set your password</button></p>
+</main>
+<script>
+const $=s=>document.querySelector(s);
+const roles=['Chairman','Managing Director','Marketing Head','R&D','Creative Head'];
+$('#r').innerHTML=roles.map(r=>`<option>${r}</option>`).join('');
+let reg=false;
+function mode(m){reg=m;
+  $('#ttl').textContent=m?'Set your password':'Log in';
+  $('#sub').textContent=m?'Pick a username, your category and a password (6+ characters).':'Enter your username, category and password.';
+  $('#cw').hidden=!m;$('#c').required=m;$('#go').textContent=m?'Save password & enter':'Log in';
+  $('#q').textContent=m?'Already have a password?':'First time here?';$('#tg').textContent=m?'Log in':'Set your password';
+  $('#p').autocomplete=m?'new-password':'current-password';$('#err').textContent='';}
+$('#tg').onclick=()=>mode(!reg);
+$('#sh').onchange=e=>{$('#p').type=$('#c').type=e.target.checked?'text':'password'};
+$('#f').onsubmit=async e=>{e.preventDefault();$('#err').textContent='';
+  if(reg&&$('#p').value!==$('#c').value){$('#err').textContent='Passwords do not match';return}
+  $('#go').disabled=true;
+  try{
+    const r=await fetch(reg?'/api/register':'/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:$('#u').value,role:$('#r').value,password:$('#p').value})});
+    const d=await r.json();
+    if(!r.ok){$('#err').textContent=d.error||'Something went wrong';$('#go').disabled=false;return}
+    try{localStorage.setItem('u360role',d.role)}catch(x){}
+    location.href='/';
+  }catch(x){$('#err').textContent='Cannot reach the server';$('#go').disabled=false}
+};
+</script></body></html>
